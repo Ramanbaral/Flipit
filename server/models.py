@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime, Enum, Boolean, Integer, ForeignKey, Text
+from sqlalchemy import Column, Numeric, String, Float, DateTime, Enum, Boolean, Integer, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
@@ -108,14 +108,12 @@ class Order(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
-    listing_id = Column(UUID(as_uuid=True), ForeignKey("listings.id"))
+    listing_id = Column(UUID(as_uuid=True), ForeignKey("listings.id"), nullable=False)
+    buyer_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    seller_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
-    buyer_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    final_price = Column(Numeric(12,2), nullable=False)
 
-    seller_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
-
-    final_price = Column(Float, nullable=False)
-
-    status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
+    status = Column(String, default="PENDING")
 
     created_at = Column(DateTime, default=datetime.utcnow)

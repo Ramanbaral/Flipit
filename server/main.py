@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 import models, schemas, crud
 from database import engine, get_db
 from crud import create_bid
+from crud import close_auction
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -52,6 +53,13 @@ def get_bids(listing_id: str, db: Session = Depends(get_db)):
 @app.get("/bids/{listing_id}/highest")
 def highest_bid(listing_id: str, db: Session = Depends(get_db)):
     return crud.get_highest_bid(db, listing_id)
+
+@app.post("/auction/close/{listing_id}")
+def close_auction_route(listing_id: str, db: Session = Depends(get_db)):
+    try:
+        return close_auction(db, listing_id)
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/")
 def home():
