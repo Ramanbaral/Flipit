@@ -1,71 +1,62 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
-from database import SessionLocal, engine, Base
+from database import engine
+from scheduler import start_scheduler
+from ws_manager import manager
+
 import models
-import schemas
-import crud
-from auth import verify_token
 
-Base.metadata.create_all(bind=engine)
+from routes import listings, bids, auctions
+
+# -------------------------
+# DB INIT (DEV ONLY)
+# -------------------------
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+# -------------------------
+# CORS
+# -------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# DB
-def get_db():
-    db = SessionLocal()
+# -------------------------
+# ROUTES
+# -------------------------
+app.include_router(listings.router)
+app.include_router(bids.router)
+app.include_router(auctions.router)
+
+# -------------------------
+# STARTUP TASKS
+# -------------------------
+@app.on_event("startup")
+def startup_event():
+    start_scheduler()
+
+# -------------------------
+# WEBSOCKET
+# -------------------------
+@app.websocket("/ws/listings/{listing_id}")
+async def listing_ws(websocket: WebSocket, listing_id: str):
+    await manager.connect(listing_id, websocket)
+
     try:
-        yield db
-    finally:
-        db.close()
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(listing_id, websocket)
 
-
-# ROOT
+# -------------------------
+# HEALTH CHECK
+# -------------------------
 @app.get("/")
-def root():
+def home():
     return {"message": "Flipit API running"}
-
-
-# CREATE LISTING (AUTH REQUIRED)
-@app.post("/listings")
-def create_listing(
-    listing: schemas.ListingCreate,
-    db: Session = Depends(get_db),
-    user = Depends(verify_token)
-):
-    user_id = user["id"]  # Supabase user ID
-
-    return crud.create_listing(db, listing, user_id)
-
-
-# GET ALL LISTINGS
-@app.get("/listings")
-def get_listings(db: Session = Depends(get_db)):
-    return crud.get_listings(db)
-
-
-# GET ONE
-@app.get("/listings/{listing_id}")
-def get_listing(listing_id: str, db: Session = Depends(get_db)):
-    listing = crud.get_listing(db, listing_id)
-
-    if not listing:
-        raise HTTPException(status_code=404, detail="Not found")
-
-    return listing
-
-
-# DELETE LISTING (AUTH REQUIRED)
-@app.delete("/listings/{listing_id}")
-def delete_listing(
-    listing_id: str,
-    db: Session = Depends(get_db),
-    user = Depends(verify_token)
-):
-    result = crud.delete_listing(db, listing_id, user["id"])
-
-    if not result:
-        raise HTTPException(status_code=404, detail="Not found")
-
-    return {"message": "Deleted"}
