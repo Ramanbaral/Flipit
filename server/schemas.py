@@ -1,25 +1,28 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 
-# -------------------------
-# LISTING
-# -------------------------
+
 class ListingCreate(BaseModel):
-    seller_id: str
+    seller_id: UUID
     category_id: int
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     type: str
+    price: float | None = None
+    start_price: float | None = None
+    end_time: datetime | None = None
 
-    # FIXED listing
-    price: Optional[float] = None
 
-    # AUCTION listing
-    start_price: Optional[float] = None
-    end_time: Optional[datetime] = None
+class ListingOut(ListingCreate):
+    id: UUID
+    is_active: bool
+    created_at: datetime
 
+    class Config:
+        from_attributes = True
 
 class ListingResponse(BaseModel):
     id: str

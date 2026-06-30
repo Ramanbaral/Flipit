@@ -1,66 +1,62 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-import models, schemas, crud
-from database import engine, get_db
-from crud import create_bid
-from crud import close_auction
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
+from database import engine
+from scheduler import start_scheduler
+from ws_manager import manager
+
+import models
+
+from routes import listings, bids, auctions
+
+# -------------------------
+# DB INIT (DEV ONLY)
+# -------------------------
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
-    
 # -------------------------
-# LISTINGS
+# CORS
 # -------------------------
-@app.post("/listings")
-def create_listing(listing: schemas.ListingCreate, db: Session = Depends(get_db)):
-    return crud.create_listing(db, listing)
-
-
-@app.get("/listings")
-def get_listings(db: Session = Depends(get_db)):
-    return crud.get_listings(db)
-
-
-@app.get("/listings/{listing_id}")
-def get_listing(listing_id: str, db: Session = Depends(get_db)):
-    return crud.get_listing(db, listing_id)
-
-
-@app.delete("/listings/{listing_id}")
-def delete_listing(listing_id: str, db: Session = Depends(get_db)):
-    return crud.delete_listing(db, listing_id)
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # -------------------------
-# BIDS
+# ROUTES
 # -------------------------
-@app.post("/bids")
-def place_bid(bid: schemas.BidCreate, db: Session = Depends(get_db)):
+app.include_router(listings.router)
+app.include_router(bids.router)
+app.include_router(auctions.router)
+
+# -------------------------
+# STARTUP TASKS
+# -------------------------
+@app.on_event("startup")
+def startup_event():
+    start_scheduler()
+
+# -------------------------
+# WEBSOCKET
+# -------------------------
+@app.websocket("/ws/listings/{listing_id}")
+async def listing_ws(websocket: WebSocket, listing_id: str):
+    await manager.connect(listing_id, websocket)
+
     try:
-        return create_bid(db, bid)
-    except Exception as e:
-        return {"error": str(e)}
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(listing_id, websocket)
 
-
-@app.get("/bids/{listing_id}")
-def get_bids(listing_id: str, db: Session = Depends(get_db)):
-    return crud.get_bids(db, listing_id)
-
-
-@app.get("/bids/{listing_id}/highest")
-def highest_bid(listing_id: str, db: Session = Depends(get_db)):
-    return crud.get_highest_bid(db, listing_id)
-
-@app.post("/auction/close/{listing_id}")
-def close_auction_route(listing_id: str, db: Session = Depends(get_db)):
-    try:
-        return close_auction(db, listing_id)
-    except Exception as e:
-        return {"error": str(e)}
-
+# -------------------------
+# HEALTH CHECK
+# -------------------------
 @app.get("/")
 def home():
     return {"message": "Flipit API running"}

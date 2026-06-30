@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Numeric, String, Float, DateTime, Enum, Boolean, Integer, ForeignKey, Text
+from sqlalchemy import Column, String, Float, DateTime, Enum, Boolean, Integer, ForeignKey, Text, Numeric
 from sqlalchemy.dialects.postgresql import UUID
+from database import Base
 import uuid
 from datetime import datetime
-from database import Base
 import enum
 
 
@@ -14,6 +14,14 @@ class ListingType(str, enum.Enum):
     AUCTION = "AUCTION"
 
 
+class ItemCondition(str, enum.Enum):
+    NEW = "NEW"
+    LIKE_NEW = "LIKE_NEW"
+    GOOD = "GOOD"
+    FAIR = "FAIR"
+    USED = "USED"
+
+
 class OrderStatus(str, enum.Enum):
     PENDING = "PENDING"
     COMPLETED = "COMPLETED"
@@ -21,7 +29,7 @@ class OrderStatus(str, enum.Enum):
 
 
 # -------------------------
-# USERS (Supabase-managed identity)
+# USERS
 # -------------------------
 class User(Base):
     __tablename__ = "users"
@@ -31,6 +39,9 @@ class User(Base):
     display_name = Column(String, nullable=False)
     avatar_url = Column(String)
     bio = Column(Text)
+    seller_rating = Column(Numeric(2,1), default=5.0)
+    total_sales = Column(Integer, default=0)
+    total_purchases = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -52,40 +63,26 @@ class Listing(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
-    seller_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
-
+    seller_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"))
     category_id = Column(Integer, ForeignKey("categories.id"))
 
     title = Column(String, nullable=False)
-
     description = Column(Text)
+
+    quantity = Column(Integer, default=1)
+    condition = Column(Enum(ItemCondition), default=ItemCondition.GOOD)
 
     type = Column(Enum(ListingType), nullable=False)
 
     price = Column(Float)
-
     start_price = Column(Float)
-
     current_price = Column(Float)
 
     end_time = Column(DateTime)
-
     is_active = Column(Boolean, default=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
-
-
-# -------------------------
-# LISTING IMAGES
-# -------------------------
-class ListingImage(Base):
-    __tablename__ = "listing_images"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
-    listing_id = Column(UUID(as_uuid=True), ForeignKey("listings.id"))
-
-    image_url = Column(Text, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow)
 
 
 # -------------------------
@@ -94,11 +91,16 @@ class ListingImage(Base):
 class Bid(Base):
     __tablename__ = "bids"
 
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    listing_id = Column(UUID, ForeignKey("listings.id"))
-    user_id = Column(UUID, ForeignKey("users.id"))
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    listing_id = Column(UUID(as_uuid=True), ForeignKey("listings.id", ondelete="CASCADE"))
+
+    # IMPORTANT FIX (was user_id mismatch earlier)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"))
+
     amount = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
 
 # -------------------------
 # ORDERS
@@ -108,12 +110,12 @@ class Order(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
-    listing_id = Column(UUID(as_uuid=True), ForeignKey("listings.id"), nullable=False)
-    buyer_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    seller_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    listing_id = Column(UUID(as_uuid=True), ForeignKey("listings.id"))
+    buyer_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    seller_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
     final_price = Column(Numeric(12,2), nullable=False)
 
-    status = Column(String, default="PENDING")
+    status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
 
     created_at = Column(DateTime, default=datetime.utcnow)

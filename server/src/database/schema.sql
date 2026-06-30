@@ -4,7 +4,7 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- =========================================
--- ENUM TYPES
+-- ENUMS
 -- =========================================
 CREATE TYPE listing_type AS ENUM ('FIXED', 'AUCTION');
 
@@ -24,7 +24,6 @@ CREATE TYPE order_status AS ENUM (
 
 -- =========================================
 -- USERS
--- (Supabase-compatible, enriched profile)
 -- =========================================
 CREATE TABLE users (
     id UUID PRIMARY KEY,
@@ -47,15 +46,6 @@ CREATE TABLE categories (
 );
 
 -- =========================================
--- USER INTERESTS (for recommendations)
--- =========================================
-CREATE TABLE user_interests (
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-    PRIMARY KEY(user_id, category_id)
-);
-
--- =========================================
 -- LISTINGS
 -- =========================================
 CREATE TABLE listings (
@@ -69,7 +59,6 @@ CREATE TABLE listings (
 
     quantity INTEGER DEFAULT 1,
     condition item_condition DEFAULT 'GOOD',
-    location TEXT,
 
     type listing_type NOT NULL,
 
@@ -78,12 +67,12 @@ CREATE TABLE listings (
     current_price NUMERIC(12,2),
 
     end_time TIMESTAMP,
-
     is_active BOOLEAN DEFAULT TRUE,
 
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
 
+    -- FIXED vs AUCTION RULE
     CHECK (
         (
             type = 'FIXED'
@@ -105,19 +94,20 @@ CREATE TABLE listings (
 -- =========================================
 CREATE TABLE listing_images (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
     image_url TEXT NOT NULL,
     image_order INTEGER DEFAULT 1
 );
 
 -- =========================================
--- BIDS
+-- BIDS (FIXED)
 -- =========================================
 CREATE TABLE bids (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+
+    -- IMPORTANT: must match SQLAlchemy (user_id)
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
     amount NUMERIC(12,2) NOT NULL,
@@ -130,11 +120,9 @@ CREATE TABLE bids (
 -- =========================================
 CREATE TABLE bid_analytics (
     listing_id UUID PRIMARY KEY REFERENCES listings(id) ON DELETE CASCADE,
-
     total_bids INTEGER DEFAULT 0,
     highest_bid NUMERIC(12,2),
     average_bid NUMERIC(12,2),
-
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -145,6 +133,7 @@ CREATE TABLE orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     listing_id UUID NOT NULL REFERENCES listings(id),
+
     buyer_id UUID NOT NULL REFERENCES users(id),
     seller_id UUID NOT NULL REFERENCES users(id),
 
@@ -156,7 +145,7 @@ CREATE TABLE orders (
 );
 
 -- =========================================
--- LISTING VIEWS (for recommendations)
+-- LISTING VIEWS
 -- =========================================
 CREATE TABLE listing_views (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -168,7 +157,7 @@ CREATE TABLE listing_views (
 );
 
 -- =========================================
--- INDEXES (PERFORMANCE)
+-- INDEXES
 -- =========================================
 CREATE INDEX idx_listing_seller ON listings(seller_id);
 CREATE INDEX idx_listing_category ON listings(category_id);
@@ -176,7 +165,7 @@ CREATE INDEX idx_listing_type ON listings(type);
 CREATE INDEX idx_listing_active ON listings(is_active);
 
 CREATE INDEX idx_bid_listing ON bids(listing_id);
-CREATE INDEX idx_bid_bidder ON bids(bidder_id);
+CREATE INDEX idx_bid_user ON bids(user_id);
 
 CREATE INDEX idx_order_buyer ON orders(buyer_id);
 CREATE INDEX idx_order_seller ON orders(seller_id);
@@ -203,4 +192,4 @@ VALUES
 ('Home'),
 ('Vehicles'),
 ('Collectibles'),
-('Music'); 
+('Music');
