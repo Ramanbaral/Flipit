@@ -7,13 +7,8 @@ router = APIRouter(prefix="/bids", tags=["Bids"])
 
 
 @router.post("")
-async def create(
-    listing_id: str,
-    user_id: str,
-    amount: float,
-    db: Session = Depends(get_db)
-):
-    return await service.create_bid(db, listing_id, user_id, amount)
+def create_bid(listing_id: str, user_id: str, amount: float, db: Session = Depends(get_db)):
+    return service.create_bid(db, listing_id, user_id, amount)
 
 
 @router.get("/{listing_id}")

@@ -3,33 +3,40 @@ from fastapi import HTTPException
 from models import Listing, Bid
 from datetime import datetime
 
-# For Step 7c
-from ws_manager import manager
 
+def create_bid(db: Session, listing_id: str, user_id: str, amount: float):
 
-async def create_bid(
-    db: Session,
-    listing_id: str,
-    user_id: str,
-    amount: float
-):
-    # Find listing
-    listing = (
-        db.query(Listing)
-        .filter(Listing.id == listing_id)
-        .first()
-    )
+    # ----------------------
+    # 1. GET LISTING
+    # ----------------------
+    listing = db.query(Listing).filter(Listing.id == listing_id).first()
 
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
 
+    # ----------------------
+    # 2. VALIDATE AUCTION TYPE
+    # ----------------------
     if listing.type != "AUCTION":
         raise HTTPException(status_code=400, detail="Not an auction listing")
 
+    # ----------------------
+    # 3. CHECK ACTIVE STATUS
+    # ----------------------
     if not listing.is_active:
-        raise HTTPException(status_code=400, detail="Auction closed")
+        raise HTTPException(status_code=400, detail="Auction is closed")
 
-    # Highest bid
+    # ----------------------
+    # 4. CHECK END TIME
+    # ----------------------
+    if listing.end_time and listing.end_time < datetime.utcnow():
+        listing.is_active = False
+        db.commit()
+        raise HTTPException(status_code=400, detail="Auction has ended")
+
+    # ----------------------
+    # 5. GET CURRENT HIGHEST BID
+    # ----------------------
     highest = (
         db.query(Bid)
         .filter(Bid.listing_id == listing_id)
@@ -37,13 +44,18 @@ async def create_bid(
         .first()
     )
 
+    # ----------------------
+    # 6. VALIDATE BID AMOUNT
+    # ----------------------
     if highest and amount <= highest.amount:
         raise HTTPException(
             status_code=400,
-            detail="Bid must be higher than current highest bid"
+            detail=f"Bid must be higher than {highest.amount}"
         )
 
-    # Create bid
+    # ----------------------
+    # 7. CREATE BID
+    # ----------------------
     bid = Bid(
         listing_id=listing_id,
         user_id=user_id,
@@ -51,31 +63,29 @@ async def create_bid(
         created_at=datetime.utcnow()
     )
 
+    db.add(bid)
+
+    # ----------------------
+    # 8. UPDATE LISTING PRICE
+    # ----------------------
     listing.current_price = amount
 
-    db.add(bid)
     db.commit()
     db.refresh(bid)
 
-    # Broadcast to connected clients
-    await manager.broadcast(
-        listing_id,
-        {
-            "type": "NEW_BID",
-            "listing_id": listing_id,
-            "user_id": user_id,
-            "amount": float(bid.amount)
-        }
-    )
-
-    return bid
+    return {
+        "message": "Bid placed successfully",
+        "bid_id": str(bid.id),
+        "amount": bid.amount,
+        "current_price": listing.current_price
+    }
 
 
 def get_bids(db: Session, listing_id: str):
     return (
         db.query(Bid)
         .filter(Bid.listing_id == listing_id)
-        .order_by(Bid.created_at.desc())
+        .order_by(Bid.amount.desc())
         .all()
     )
 
