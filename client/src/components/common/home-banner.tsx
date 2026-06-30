@@ -1,6 +1,6 @@
 export function HomeBanner() {
   return (
-    <div className="rounded-2xl border border-border bg-white px-10 py-10 shadow-sm">
+    <div className="rounded-xl border border-border bg-gradient-to-br from-blue-50 to-indigo-100 px-10 py-10 shadow-sm ">
       <h1 className="text-4xl font-extrabold leading-tight text-foreground">
         Find your next{' '}
         <span className="text-primary">treasure</span>

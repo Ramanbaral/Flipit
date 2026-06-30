@@ -1,6 +1,6 @@
 import { AuctionCard, type AuctionCardProps } from './auction-card';
 
-const TRENDING: Omit<AuctionCardProps, 'onBidNow'> & { id: string }[] = [
+const TRENDING: (Omit<AuctionCardProps, 'onBidNow'> & { id: string })[] = [
   {
     id: '1',
     timer: '04:12:30',

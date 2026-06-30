@@ -13,7 +13,7 @@ function HomePage() {
 
   return (
     <div className="flex flex-1">
-      <div className="sticky top-14 h-[calc(100vh-56px)] shrink-0 self-start">
+      <div className="sticky top-14 h-[calc(100vh-56px)] self-start overflow-hidden">
         <CategorySidebar
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 
 function AuctionCard() {
   return (
-    <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="w-full max-w-sm overflow-hidden rounded-md bg-white shadow-2xl">
       {/* Card image area */}
       <div className="relative">
         {/* Timer + LIVE badges */}

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Bell, CircleUser, Search } from 'lucide-react';
+import { Bell, CircleUser, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -48,11 +48,12 @@ export function Navbar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          <Button size="sm" className="rounded-lg px-4 text-sm font-semibold">
+          <Button size="lg" className="rounded-md px-4 text-sm font-semibold">
             Create Listing
+            <Plus className="ml-2 h-4 w-4" />
           </Button>
           <button className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-            <Bell className="h-4 w-4" />
+            <Bell className="h-5 w-5" />
           </button>
           <button className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
             <CircleUser className="h-5 w-5" />
