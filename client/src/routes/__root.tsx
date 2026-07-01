@@ -1,4 +1,5 @@
 import { Outlet, createRootRoute, useLocation } from '@tanstack/react-router';
+import { Toaster } from 'react-hot-toast';
 import { Footer } from '@/components/common/footer';
 import { Navbar } from '@/components/common/navbar';
 
@@ -13,16 +14,24 @@ function RootComponent() {
   const isAuthPage = AUTH_PATHS.includes(pathname);
 
   if (isAuthPage) {
-    return <Outlet />;
+    return (
+      <>
+        <Outlet />
+        <Toaster position="top-center" />
+      </>
+    );
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex flex-1 flex-col">
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex flex-1 flex-col">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
+      <Toaster position="top-center" />
+    </>
   );
 }

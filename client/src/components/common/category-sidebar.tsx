@@ -87,8 +87,8 @@ export function CategorySidebar({
                 key={id}
                 onClick={() => onCategoryChange?.(id)}
                 className={cn(
-                  'group relative flex w-full items-center rounded-lg transition-all duration-150',
-                  collapsed ? 'justify-center py-2.5' : 'gap-3 px-3 py-2',
+                  'group relative flex w-full items-center rounded-md transition-all duration-150',
+                  collapsed ? 'justify-center py-3' : 'gap-3 px-3 py-2',
                   isActive
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground',

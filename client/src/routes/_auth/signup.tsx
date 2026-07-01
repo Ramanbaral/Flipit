@@ -1,10 +1,12 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 const PREFERENCES = [
   { id: 'electronics', label: 'Electronics', icon: '⚡' },
@@ -36,6 +38,7 @@ export const Route = createFileRoute('/_auth/signup')({
 });
 
 function SignupPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -57,8 +60,24 @@ function SignupPage() {
   });
 
   const onSubmit = async (data: SignupFormData) => {
-    console.log('Signup data:', data);
-    // TODO: connect to API
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          full_name: data.fullName,
+          preferences: data.preferences,
+        },
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success('Account created! Check your email to confirm your account.');
+    navigate({ to: '/login' });
   };
 
   return (

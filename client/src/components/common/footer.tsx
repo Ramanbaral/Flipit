@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router';
+
 const FOOTER_LINKS: Record<string, { label: string; href: string }[]> = {
   Marketplace: [
     { label: 'Auctions', href: '#' },
@@ -55,6 +57,29 @@ export function Footer() {
                 </ul>
               </div>
             ))}
+
+            {/* Account */}
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Account</h3>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <Link
+                    to="/login"
+                    className="text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
+                  >
+                    Sign in
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/signup"
+                    className="text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
+                  >
+                    Create account
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

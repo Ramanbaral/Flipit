@@ -1,10 +1,12 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -19,6 +21,7 @@ export const Route = createFileRoute('/_auth/login')({
 });
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -36,8 +39,17 @@ function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log('Login data:', data);
-    // TODO: connect to API
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    navigate({ to: '/' });
   };
 
   return (
