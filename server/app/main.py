@@ -1,12 +1,20 @@
+import asyncio
+from app.router import websocket
+from app.scheduler import auction_scheduler
+from app.core.logger import logger
 from contextlib import asynccontextmanager
-
+from app.core.exceptions import register_exception_handlers
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.router import listings, bids, auctions
+from app.router import (
+    listings,
+    bids,
+    auctions,
+    websocket,
+)
 
 
 # ==========================================================
@@ -15,11 +23,24 @@ from app.router import listings, bids, auctions
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Starting Flipit API...")
+
+    logger.info("Starting Flipit API...")
+
+    scheduler_task = asyncio.create_task(
+        auction_scheduler()
+    )
+
     yield
-    print("Shutting down Flipit API...")
 
+    logger.info("Stopping Flipit API...")
 
+    scheduler_task.cancel()
+
+    try:
+        await scheduler_task
+
+    except asyncio.CancelledError:
+        logger.info("Auction scheduler stopped.")
 # ==========================================================
 # FASTAPI APP
 # ==========================================================
@@ -31,6 +52,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+register_exception_handlers(app)
 # ==========================================================
 # GLOBAL EXCEPTION HANDLERS
 # ==========================================================
@@ -98,6 +120,7 @@ app.add_middleware(
 app.include_router(listings.router)
 app.include_router(bids.router)
 app.include_router(auctions.router)
+app.include_router(websocket.router)
 
 
 # ==========================================================
