@@ -21,7 +21,7 @@ from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
     from .models import User, Listing, Bid, Order, Category
 
-from Flipit.server.app.core.database import Base
+from app.core.database import Base
 
 
 # ==========================================================
@@ -124,25 +124,7 @@ class User(Base):
         back_populates="seller",
     )
 
-# Bids placed by this user
-bids: Mapped[List["Bid"]] = relationship(
-    "Bid",
-    back_populates="user",
-)
 
-# Orders where this user is buyer
-purchases: Mapped[List["Order"]] = relationship(
-    "Order",
-    foreign_keys="Order.buyer_id",
-    back_populates="buyer",
-)
-
-# Orders where this user is seller
-sales: Mapped[List["Order"]] = relationship(
-    "Order",
-    foreign_keys="Order.seller_id",
-    back_populates="seller",
-)
 
 
 # ==========================================================

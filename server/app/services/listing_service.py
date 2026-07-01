@@ -1,33 +1,187 @@
+from typing import Optional
+from uuid import UUID
+
+from fastapi import HTTPException, status
 from sqlalchemy import select, or_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Listing
-import schemas
+from app import schemas
+from app.core.logger import logger
+from app.models import Listing, ListingType
 
 
-async def create_listing(db: AsyncSession, data: schemas.ListingCreate):
+# ==========================================================
+# VALIDATE LISTING
+# ==========================================================
+
+def validate_listing(data: schemas.ListingCreate):
+    """
+    Validate listing based on listing type.
+    """
+
+    if data.type == ListingType.FIXED:
+
+        if data.price is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Fixed listings require a price.",
+            )
+
+        if data.start_price is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Fixed listings cannot have a start price.",
+            )
+
+        if data.end_time is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Fixed listings cannot have an end time.",
+            )
+
+    elif data.type == ListingType.AUCTION:
+
+        if data.start_price is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Auction listings require a starting price.",
+            )
+
+        if data.end_time is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Auction listings require an end time.",
+            )
+
+        if data.price is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Auction listings cannot have a fixed price.",
+            )
+
+
+# ==========================================================
+# CREATE LISTING
+# ==========================================================
+
+async def create_listing(
+    db: AsyncSession,
+    data: schemas.ListingCreate,
+):
+    validate_listing(data)
+
+    logger.info(
+        f"Creating new {data.type.value} listing: '{data.title}'"
+    )
+
     listing = Listing(**data.model_dump())
 
+    if listing.type == ListingType.FIXED:
+        listing.current_price = listing.price
+    else:
+        listing.current_price = listing.start_price
+
     db.add(listing)
+
     await db.commit()
     await db.refresh(listing)
 
+    logger.info(
+        f"Listing {listing.id} created successfully."
+    )
+
     return listing
 
 
-async def get_listing(db: AsyncSession, listing_id):
-    res = await db.execute(
+# ==========================================================
+# UPDATE LISTING
+# ==========================================================
+
+async def update_listing(
+    db: AsyncSession,
+    listing_id: UUID,
+    data: schemas.ListingUpdate,
+):
+    result = await db.execute(
         select(Listing).where(Listing.id == listing_id)
     )
-    listing = res.scalar_one_or_none()
+
+    listing = result.scalar_one_or_none()
 
     if not listing:
-        raise ValueError("Listing not found")
+        logger.error(
+            f"Update failed: Listing {listing_id} not found."
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Listing not found",
+        )
+
+    logger.info(
+        f"Updating listing {listing.id}"
+    )
+
+    update_data = data.model_dump(exclude_unset=True)
+
+    for field, value in update_data.items():
+        setattr(listing, field, value)
+
+    if listing.type == ListingType.FIXED:
+        listing.current_price = listing.price
+
+    await db.commit()
+    await db.refresh(listing)
+
+    logger.info(
+        f"Listing {listing.id} updated successfully."
+    )
 
     return listing
 
 
-async def get_listings(db: AsyncSession, search=None):
+# ==========================================================
+# GET SINGLE LISTING
+# ==========================================================
+
+async def get_listing(
+    db: AsyncSession,
+    listing_id: UUID,
+):
+    result = await db.execute(
+        select(Listing).where(Listing.id == listing_id)
+    )
+
+    listing = result.scalar_one_or_none()
+
+    if not listing:
+        logger.error(
+            f"Listing {listing_id} not found."
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Listing not found",
+        )
+
+    return listing
+
+
+# ==========================================================
+# GET ALL LISTINGS
+# ==========================================================
+
+async def get_listings(
+    db: AsyncSession,
+    search: Optional[str] = None,
+    category_id: Optional[int] = None,
+    listing_type: Optional[ListingType] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    sort: str = "newest",
+    limit: int = 10,
+    offset: int = 0,
+):
     query = select(Listing)
 
     if search:
@@ -38,21 +192,96 @@ async def get_listings(db: AsyncSession, search=None):
             )
         )
 
-    res = await db.execute(query)
-    return res.scalars().all()
+    if category_id is not None:
+        query = query.where(
+            Listing.category_id == category_id
+        )
+
+    if listing_type:
+        query = query.where(
+            Listing.type == listing_type
+        )
+
+    if min_price is not None:
+        query = query.where(
+            Listing.current_price >= min_price
+        )
+
+    if max_price is not None:
+        query = query.where(
+            Listing.current_price <= max_price
+        )
+
+    if sort == "newest":
+        query = query.order_by(desc(Listing.created_at))
+
+    elif sort == "oldest":
+        query = query.order_by(Listing.created_at)
+
+    elif sort == "price_low":
+        query = query.order_by(Listing.current_price.asc())
+
+    elif sort == "price_high":
+        query = query.order_by(Listing.current_price.desc())
+
+    else:
+        logger.warning(
+            f"Invalid sort option requested: {sort}"
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid sort option.",
+        )
+
+    query = query.offset(offset).limit(limit)
+
+    result = await db.execute(query)
+
+    items = result.scalars().all()
+
+    logger.info(
+        f"Fetched {len(items)} listings."
+    )
+
+    return {
+        "items": items,
+        "count": len(items),
+    }
 
 
-async def delete_listing(db: AsyncSession, listing_id):
-    res = await db.execute(
+# ==========================================================
+# DELETE LISTING
+# ==========================================================
+
+async def delete_listing(
+    db: AsyncSession,
+    listing_id: UUID,
+):
+    result = await db.execute(
         select(Listing).where(Listing.id == listing_id)
     )
 
-    listing = res.scalar_one_or_none()
+    listing = result.scalar_one_or_none()
 
     if not listing:
-        raise ValueError("Listing not found")
+        logger.error(
+            f"Delete failed: Listing {listing_id} not found."
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Listing not found",
+        )
 
     await db.delete(listing)
     await db.commit()
 
-    return {"message": "deleted"}
+    logger.warning(
+        f"Listing {listing.id} deleted."
+    )
+
+    return {
+        "success": True,
+        "message": "Listing deleted successfully.",
+    }
