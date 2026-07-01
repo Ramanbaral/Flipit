@@ -9,12 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateListingRouteImport } from './routes/create-listing'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UserProfileUserIdRouteImport } from './routes/user-profile.$userId'
+import { Route as ListingDetailIdRouteImport } from './routes/listing-detail.$id'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreateListingRoute = CreateListingRouteImport.update({
   id: '/create-listing',
   path: '/create-listing',
@@ -28,6 +42,16 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserProfileUserIdRoute = UserProfileUserIdRouteImport.update({
+  id: '/user-profile/$userId',
+  path: '/user-profile/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListingDetailIdRoute = ListingDetailIdRouteImport.update({
+  id: '/listing-detail/$id',
+  path: '/listing-detail/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -45,48 +69,100 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/create-listing': typeof CreateListingRoute
+  '/dashboard': typeof DashboardRoute
+  '/search': typeof SearchRoute
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
+  '/listing-detail/$id': typeof ListingDetailIdRoute
+  '/user-profile/$userId': typeof UserProfileUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/create-listing': typeof CreateListingRoute
+  '/dashboard': typeof DashboardRoute
+  '/search': typeof SearchRoute
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
+  '/listing-detail/$id': typeof ListingDetailIdRoute
+  '/user-profile/$userId': typeof UserProfileUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/create-listing': typeof CreateListingRoute
+  '/dashboard': typeof DashboardRoute
+  '/search': typeof SearchRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/listing-detail/$id': typeof ListingDetailIdRoute
+  '/user-profile/$userId': typeof UserProfileUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/create-listing' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/create-listing'
+    | '/dashboard'
+    | '/search'
+    | '/login'
+    | '/signup'
+    | '/listing-detail/$id'
+    | '/user-profile/$userId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/create-listing' | '/login' | '/signup'
+  to:
+    | '/'
+    | '/about'
+    | '/create-listing'
+    | '/dashboard'
+    | '/search'
+    | '/login'
+    | '/signup'
+    | '/listing-detail/$id'
+    | '/user-profile/$userId'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/create-listing'
+    | '/dashboard'
+    | '/search'
     | '/_auth/login'
     | '/_auth/signup'
+    | '/listing-detail/$id'
+    | '/user-profile/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   CreateListingRoute: typeof CreateListingRoute
+  DashboardRoute: typeof DashboardRoute
+  SearchRoute: typeof SearchRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  ListingDetailIdRoute: typeof ListingDetailIdRoute
+  UserProfileUserIdRoute: typeof UserProfileUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create-listing': {
       id: '/create-listing'
       path: '/create-listing'
@@ -106,6 +182,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user-profile/$userId': {
+      id: '/user-profile/$userId'
+      path: '/user-profile/$userId'
+      fullPath: '/user-profile/$userId'
+      preLoaderRoute: typeof UserProfileUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listing-detail/$id': {
+      id: '/listing-detail/$id'
+      path: '/listing-detail/$id'
+      fullPath: '/listing-detail/$id'
+      preLoaderRoute: typeof ListingDetailIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/signup': {
@@ -129,8 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   CreateListingRoute: CreateListingRoute,
+  DashboardRoute: DashboardRoute,
+  SearchRoute: SearchRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
+  ListingDetailIdRoute: ListingDetailIdRoute,
+  UserProfileUserIdRoute: UserProfileUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

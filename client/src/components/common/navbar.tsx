@@ -1,5 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Bell, LogOut, Plus, Search } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, LogOut, Plus, Search, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,12 +18,20 @@ import { useAuth } from '@/hooks/useAuth';
 
 const NAV_LINKS = [
   { label: 'Explore', to: '/' as const },
-  { label: 'Dashboard', to: '/about' as const },
+  { label: 'Dashboard', to: '/dashboard' as const },
 ];
 
 export function Navbar() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      void navigate({ to: '/search', search: { q: searchQuery.trim() } });
+    }
+  };
 
   const fullName = user?.user_metadata?.full_name as string | undefined;
   const email = user?.email ?? '';
@@ -76,15 +85,17 @@ export function Navbar() {
         </nav>
 
         {/* Search */}
-        <div className="flex flex-1 items-center justify-center">
+        <form onSubmit={handleSearch} className="flex flex-1 items-center justify-center">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search for treasures..."
               className="h-9 rounded-full pl-9 text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-        </div>
+        </form>
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
@@ -117,6 +128,14 @@ export function Navbar() {
                     {email}
                   </p>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => void navigate({ to: '/user-profile/$userId', params: { userId: user?.id ?? 'me' } })}
+                  className="cursor-pointer"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  View Profile
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
