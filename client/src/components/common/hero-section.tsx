@@ -53,7 +53,8 @@ export function HeroSection() {
     <section
       className="relative min-h-[calc(100vh-64px)] overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #060c1a 0%, #0a1128 50%, #060d1f 100%)',
+        background:
+          'linear-gradient(135deg, #060c1a 0%, #0a1128 50%, #060d1f 100%)',
         backgroundImage: `
           linear-gradient(135deg, #060c1a 0%, #0a1128 50%, #060d1f 100%),
           linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
@@ -65,11 +66,15 @@ export function HeroSection() {
       {/* Ambient glow */}
       <div
         className="pointer-events-none absolute bottom-0 left-1/4 h-72 w-72 -translate-x-1/2 translate-y-1/3 rounded-full opacity-20 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #3b82f6, transparent 70%)' }}
+        style={{
+          background: 'radial-gradient(circle, #3b82f6, transparent 70%)',
+        }}
       />
       <div
         className="pointer-events-none absolute right-1/4 top-0 h-48 w-48 -translate-y-1/3 translate-x-1/2 rounded-full opacity-10 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #6366f1, transparent 70%)' }}
+        style={{
+          background: 'radial-gradient(circle, #6366f1, transparent 70%)',
+        }}
       />
 
       <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-12 px-6 py-20 lg:flex-row lg:gap-16 lg:py-28">

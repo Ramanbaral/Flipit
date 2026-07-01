@@ -44,14 +44,14 @@ export function CategorySidebar({
     <aside
       className={cn(
         'flex h-full flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-300 ease-in-out',
-        collapsed ? 'w-[60px]' : 'w-52',
+        collapsed ? 'w-[60px]' : 'w-52'
       )}
     >
       {/* Header */}
       <div
         className={cn(
           'flex items-center border-b border-sidebar-border px-3 py-4',
-          collapsed ? 'justify-center' : 'justify-between',
+          collapsed ? 'justify-center' : 'justify-between'
         )}
       >
         {!collapsed && (
@@ -91,14 +91,14 @@ export function CategorySidebar({
                   collapsed ? 'justify-center py-3' : 'gap-3 px-3 py-2',
                   isActive
                     ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
                 <Icon
                   className={cn(
                     'shrink-0 transition-transform duration-150',
                     collapsed ? 'h-[18px] w-[18px]' : 'h-4 w-4',
-                    isActive && !collapsed && 'drop-shadow-sm',
+                    isActive && !collapsed && 'drop-shadow-sm'
                   )}
                 />
 
@@ -113,7 +113,7 @@ export function CategorySidebar({
                           'rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
                           isActive
                             ? 'bg-white/20 text-primary-foreground'
-                            : 'bg-muted text-muted-foreground',
+                            : 'bg-muted text-muted-foreground'
                         )}
                       >
                         {count}
@@ -142,7 +142,7 @@ export function CategorySidebar({
       <div
         className={cn(
           'border-t border-sidebar-border px-2 py-3',
-          collapsed && 'flex justify-center',
+          collapsed && 'flex justify-center'
         )}
       >
         {collapsed ? (
@@ -157,7 +157,11 @@ export function CategorySidebar({
             </span>
           </button>
         ) : (
-          <Button variant="outline" size="sm" className="w-full gap-2 text-xs font-medium">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-2 text-xs font-medium"
+          >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             Advanced Filters
           </Button>
@@ -168,7 +172,9 @@ export function CategorySidebar({
       <div
         className={cn(
           'border-t border-sidebar-border px-2 py-3',
-          collapsed ? 'flex flex-col items-center gap-1' : 'flex flex-col gap-0.5',
+          collapsed
+            ? 'flex flex-col items-center gap-1'
+            : 'flex flex-col gap-0.5'
         )}
       >
         {UTILITIES.map(({ icon: Icon, label }) => (
@@ -177,7 +183,7 @@ export function CategorySidebar({
             title={collapsed ? label : undefined}
             className={cn(
               'group relative flex items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground',
-              collapsed ? 'h-9 w-9 justify-center' : 'w-full gap-2.5 px-3 py-2',
+              collapsed ? 'h-9 w-9 justify-center' : 'w-full gap-2.5 px-3 py-2'
             )}
           >
             <Icon className="h-4 w-4 shrink-0" />

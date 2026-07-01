@@ -36,7 +36,9 @@ export function AuctionCard({
 
       <div className="p-4">
         <h3 className="font-bold text-foreground">{title}</h3>
-        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{description}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+          {description}
+        </p>
         <div className="mt-4 flex items-end justify-between gap-2">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">

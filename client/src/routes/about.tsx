@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ChevronDown, ShieldCheck, Zap, Leaf, BadgeCheck, Truck, Headphones } from 'lucide-react';
+import {
+  ChevronDown,
+  ShieldCheck,
+  Zap,
+  Leaf,
+  BadgeCheck,
+  Truck,
+  Headphones,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/about')({
@@ -79,7 +87,7 @@ const FAQ = [
   {
     id: 3,
     q: 'What are the seller fees?',
-    a: "Listing is always free. We charge a 4% success fee only when your item sells — no monthly subscriptions, no upfront costs. For high-volume sellers, volume discounts kick in automatically.",
+    a: 'Listing is always free. We charge a 4% success fee only when your item sells — no monthly subscriptions, no upfront costs. For high-volume sellers, volume discounts kick in automatically.',
   },
   {
     id: 4,
@@ -89,7 +97,7 @@ const FAQ = [
   {
     id: 5,
     q: "What if the item I receive doesn't match the listing?",
-    a: "Open a dispute within 72 hours of delivery. Our team reviews photos and listing details and resolves most cases in under 24 hours. If the item is misrepresented, you get a full refund — including original shipping.",
+    a: 'Open a dispute within 72 hours of delivery. Our team reviews photos and listing details and resolves most cases in under 24 hours. If the item is misrepresented, you get a full refund — including original shipping.',
   },
 ];
 
@@ -105,12 +113,14 @@ function FAQRow({ q, a }: { q: string; a: string }) {
         <ChevronDown
           className={cn(
             'mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
-            open && 'rotate-180',
+            open && 'rotate-180'
           )}
         />
       </button>
       {open && (
-        <p className="pb-5 text-sm leading-relaxed text-muted-foreground">{a}</p>
+        <p className="pb-5 text-sm leading-relaxed text-muted-foreground">
+          {a}
+        </p>
       )}
     </div>
   );
@@ -119,7 +129,6 @@ function FAQRow({ q, a }: { q: string; a: string }) {
 function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
-
       {/* ── Hero ── */}
       <section className="relative overflow-hidden bg-[#060d1a] px-6 py-24 lg:px-20">
         {/* grid */}
@@ -142,12 +151,14 @@ function AboutPage() {
             About FlipIt
           </span>
           <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-white lg:text-6xl">
-            The marketplace built<br className="hidden lg:block" /> on trust.
+            The marketplace built
+            <br className="hidden lg:block" /> on trust.
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-400">
-            FlipIt started with a simple idea: buying and selling secondhand goods
-            should feel as safe and smooth as buying new. We built the infrastructure
-            to make that real — verified sellers, live auctions, and human support.
+            FlipIt started with a simple idea: buying and selling secondhand
+            goods should feel as safe and smooth as buying new. We built the
+            infrastructure to make that real — verified sellers, live auctions,
+            and human support.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -198,7 +209,9 @@ function AboutPage() {
                 </span>
                 <div>
                   <h3 className="font-bold text-foreground">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {body}
+                  </p>
                 </div>
               </div>
             ))}
@@ -226,7 +239,9 @@ function AboutPage() {
                   <Icon className="h-4 w-4 text-primary" />
                 </div>
                 <h3 className="mt-4 font-bold text-foreground">{title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  {body}
+                </p>
               </div>
             ))}
           </div>
@@ -238,12 +253,13 @@ function AboutPage() {
         <div className="mx-auto max-w-4xl">
           <div className="rounded-2xl bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-10 ring-1 ring-border lg:p-14">
             <p className="max-w-2xl text-2xl font-extrabold leading-snug tracking-tight text-foreground lg:text-3xl">
-              "Every product bought secondhand is one that didn't need to be manufactured. That matters."
+              "Every product bought secondhand is one that didn't need to be
+              manufactured. That matters."
             </p>
             <p className="mt-6 text-sm text-muted-foreground">
-              We're working toward a world where circular commerce is the default,
-              not the exception. FlipIt donates 1% of gross revenue to verified
-              climate-action nonprofits each year.
+              We're working toward a world where circular commerce is the
+              default, not the exception. FlipIt donates 1% of gross revenue to
+              verified climate-action nonprofits each year.
             </p>
           </div>
         </div>
@@ -297,7 +313,6 @@ function AboutPage() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }

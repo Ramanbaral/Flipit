@@ -88,18 +88,22 @@ function LoginPage() {
               />
             </svg>
           </div>
-          <span className="text-lg font-bold tracking-tight text-white">FlipIt</span>
+          <span className="text-lg font-bold tracking-tight text-white">
+            FlipIt
+          </span>
         </div>
 
         {/* Hero content */}
         <div className="relative z-10 space-y-8">
           <div className="space-y-4">
             <h1 className="text-[2.6rem] font-extrabold leading-[1.1] tracking-tight text-white">
-              Welcome back<br />to the floor.
+              Welcome back
+              <br />
+              to the floor.
             </h1>
             <p className="max-w-sm text-[0.95rem] leading-relaxed text-slate-400">
-              Join 240,000+ buyers and sellers trading verified secondhand goods — with bidding and
-              instant buy, all in one trusted place.
+              Join 240,000+ buyers and sellers trading verified secondhand goods
+              — with bidding and instant buy, all in one trusted place.
             </p>
           </div>
 
@@ -118,7 +122,11 @@ function LoginPage() {
                     stroke="currentColor"
                     strokeWidth={3}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <span className="text-sm text-slate-300">{feature}</span>
@@ -129,16 +137,25 @@ function LoginPage() {
           {/* Rating badge */}
           <div className="inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
             <div className="flex -space-x-2.5">
-              {['bg-blue-400', 'bg-purple-400', 'bg-cyan-400'].map((color, i) => (
-                <div
-                  key={i}
-                  className={cn('h-8 w-8 rounded-full border-2 border-[#060d1a]', color)}
-                />
-              ))}
+              {['bg-blue-400', 'bg-purple-400', 'bg-cyan-400'].map(
+                (color, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'h-8 w-8 rounded-full border-2 border-[#060d1a]',
+                      color
+                    )}
+                  />
+                )
+              )}
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Rated 4.9 / 5 by sellers</p>
-              <p className="text-xs text-slate-400">"Sold my camera in 6 hours flat."</p>
+              <p className="text-sm font-semibold text-white">
+                Rated 4.9 / 5 by sellers
+              </p>
+              <p className="text-xs text-slate-400">
+                "Sold my camera in 6 hours flat."
+              </p>
             </div>
           </div>
         </div>
@@ -187,7 +204,9 @@ function LoginPage() {
           {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400">or continue with email</span>
+            <span className="text-xs text-gray-400">
+              or continue with email
+            </span>
             <div className="h-px flex-1 bg-gray-200" />
           </div>
 
@@ -209,7 +228,9 @@ function LoginPage() {
 
             {/* Password */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700">Password</label>
+              <label className="text-sm font-medium text-gray-700">
+                Password
+              </label>
               <div className="relative">
                 <input
                   {...register('password')}
@@ -231,7 +252,9 @@ function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-red-500">{errors.password.message}</p>
+                <p className="text-xs text-red-500">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -290,7 +313,9 @@ function inputClass(hasError: boolean) {
     'w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition-all',
     'placeholder:text-gray-400',
     'focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20',
-    hasError ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20' : 'border-gray-200',
+    hasError
+      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+      : 'border-gray-200'
   );
 }
 
@@ -319,7 +344,12 @@ function GoogleIcon() {
 
 function AppleIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="currentColor"
+      aria-hidden="true"
+    >
       <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
     </svg>
   );

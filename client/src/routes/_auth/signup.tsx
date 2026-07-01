@@ -24,7 +24,9 @@ const signupSchema = z
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
     preferences: z.array(z.string()).min(1, 'Select at least one preference'),
-    agreeToTerms: z.boolean().refine((val) => val, 'You must agree to the terms'),
+    agreeToTerms: z
+      .boolean()
+      .refine((val) => val, 'You must agree to the terms'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -102,21 +104,36 @@ function SignupPage() {
         {/* Logo */}
         <div className="relative z-10 flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600">
-            <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            <svg
+              className="h-4 w-4 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
             </svg>
           </div>
-          <span className="text-lg font-bold tracking-tight text-white">FlipIt</span>
+          <span className="text-lg font-bold tracking-tight text-white">
+            FlipIt
+          </span>
         </div>
 
         {/* Hero content */}
         <div className="relative z-10 space-y-8">
           <div className="space-y-4">
             <h1 className="text-[2.6rem] font-extrabold leading-[1.1] tracking-tight text-white">
-              Start trading<br />in minutes.
+              Start trading
+              <br />
+              in minutes.
             </h1>
             <p className="max-w-sm text-[0.95rem] leading-relaxed text-slate-400">
-              Join 240,000+ buyers and sellers trading verified secondhand goods — with bidding and instant buy, all in one trusted place.
+              Join 240,000+ buyers and sellers trading verified secondhand goods
+              — with bidding and instant buy, all in one trusted place.
             </p>
           </div>
 
@@ -128,8 +145,18 @@ function SignupPage() {
             ].map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600">
-                  <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="h-3 w-3 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <span className="text-sm text-slate-300">{feature}</span>
@@ -140,16 +167,25 @@ function SignupPage() {
           {/* Rating badge */}
           <div className="inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
             <div className="flex -space-x-2.5">
-              {['bg-blue-400', 'bg-purple-400', 'bg-cyan-400'].map((color, i) => (
-                <div
-                  key={i}
-                  className={cn('h-8 w-8 rounded-full border-2 border-[#060d1a]', color)}
-                />
-              ))}
+              {['bg-blue-400', 'bg-purple-400', 'bg-cyan-400'].map(
+                (color, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'h-8 w-8 rounded-full border-2 border-[#060d1a]',
+                      color
+                    )}
+                  />
+                )
+              )}
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Rated 4.9 / 5 by sellers</p>
-              <p className="text-xs text-slate-400">"Sold my camera in 6 hours flat."</p>
+              <p className="text-sm font-semibold text-white">
+                Rated 4.9 / 5 by sellers
+              </p>
+              <p className="text-xs text-slate-400">
+                "Sold my camera in 6 hours flat."
+              </p>
             </div>
           </div>
         </div>
@@ -198,7 +234,9 @@ function SignupPage() {
           {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400">or continue with email</span>
+            <span className="text-xs text-gray-400">
+              or continue with email
+            </span>
             <div className="h-px flex-1 bg-gray-200" />
           </div>
 
@@ -238,13 +276,20 @@ function SignupPage() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </FormField>
 
             {/* Confirm password */}
-            <FormField label="Confirm password" error={errors.confirmPassword?.message}>
+            <FormField
+              label="Confirm password"
+              error={errors.confirmPassword?.message}
+            >
               <div className="relative">
                 <input
                   {...register('confirmPassword')}
@@ -270,8 +315,12 @@ function SignupPage() {
             {/* Preferences */}
             <div className="space-y-2">
               <div>
-                <label className="text-sm font-medium text-gray-700">Preferences</label>
-                <p className="text-xs text-gray-400">Select categories you're interested in</p>
+                <label className="text-sm font-medium text-gray-700">
+                  Preferences
+                </label>
+                <p className="text-xs text-gray-400">
+                  Select categories you're interested in
+                </p>
               </div>
               <Controller
                 name="preferences"
@@ -294,7 +343,7 @@ function SignupPage() {
                             'flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all',
                             selected
                               ? 'border-indigo-600 bg-indigo-600 text-white'
-                              : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600',
+                              : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600'
                           )}
                         >
                           <span className="text-base leading-none">{icon}</span>
@@ -306,7 +355,9 @@ function SignupPage() {
                 )}
               />
               {errors.preferences && (
-                <p className="text-xs text-red-500">{errors.preferences.message}</p>
+                <p className="text-xs text-red-500">
+                  {errors.preferences.message}
+                </p>
               )}
             </div>
 
@@ -333,7 +384,9 @@ function SignupPage() {
                 )}
               />
               {errors.agreeToTerms && (
-                <p className="text-xs text-red-500">{errors.agreeToTerms.message}</p>
+                <p className="text-xs text-red-500">
+                  {errors.agreeToTerms.message}
+                </p>
               )}
             </div>
 
@@ -367,7 +420,9 @@ function inputClass(hasError: boolean) {
     'w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition-all',
     'placeholder:text-gray-400',
     'focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20',
-    hasError ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20' : 'border-gray-200',
+    hasError
+      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+      : 'border-gray-200'
   );
 }
 
@@ -414,7 +469,12 @@ function GoogleIcon() {
 
 function AppleIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="currentColor"
+      aria-hidden="true"
+    >
       <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
     </svg>
   );

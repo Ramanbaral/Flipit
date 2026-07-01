@@ -27,7 +27,12 @@ export function Navbar() {
   const fullName = user?.user_metadata?.full_name as string | undefined;
   const email = user?.email ?? '';
   const initials = fullName
-    ? fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+    ? fullName
+        .split(' ')
+        .map((n: string) => n[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
     : email.slice(0, 2).toUpperCase();
 
   const handleLogout = async () => {
@@ -43,7 +48,10 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
       <div className="flex h-14 items-center gap-4 px-10">
         {/* Logo */}
-        <Link to="/" className="shrink-0 text-lg font-extrabold text-foreground no-underline">
+        <Link
+          to="/"
+          className="shrink-0 text-lg font-extrabold text-foreground no-underline"
+        >
           FlipIt
         </Link>
 
@@ -54,9 +62,12 @@ export function Navbar() {
               key={link.label}
               to={link.to}
               className={cn(
-                'px-3 py-1 text-sm font-medium text-muted-foreground transition-colors no-underline hover:text-foreground',
+                'px-3 py-1 text-sm font-medium text-muted-foreground transition-colors no-underline hover:text-foreground'
               )}
-              activeProps={{ className: 'text-foreground underline underline-offset-4 decoration-primary' }}
+              activeProps={{
+                className:
+                  'text-foreground underline underline-offset-4 decoration-primary',
+              }}
               activeOptions={{ exact: link.to === '/' }}
             >
               {link.label}
@@ -77,10 +88,12 @@ export function Navbar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          <Button size="lg" className="rounded-md px-4 text-sm font-semibold">
-            Create Listing
-            <Plus className="ml-2 h-4 w-4" />
-          </Button>
+          <Link to="/create-listing" className="no-underline">
+            <Button size="lg" className="rounded-md px-4 text-sm font-semibold">
+              Create Listing
+              <Plus className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
 
           {!loading && user && (
             <button className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
@@ -100,7 +113,9 @@ export function Navbar() {
                   <p className="text-sm font-semibold text-foreground">
                     {fullName ?? 'Account'}
                   </p>
-                  <p className="truncate text-xs text-muted-foreground">{email}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {email}
+                  </p>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

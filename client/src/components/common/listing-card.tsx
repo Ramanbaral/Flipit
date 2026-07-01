@@ -15,17 +15,17 @@ export interface ListingCardProps {
 }
 
 const CONDITION_STYLES: Record<ListingCondition, string> = {
-  'new': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  new: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   'like-new': 'bg-blue-100 text-blue-700 border-blue-200',
-  'good': 'bg-amber-100 text-amber-700 border-amber-200',
-  'fair': 'bg-gray-100 text-gray-600 border-gray-200',
+  good: 'bg-amber-100 text-amber-700 border-amber-200',
+  fair: 'bg-gray-100 text-gray-600 border-gray-200',
 };
 
 const CONDITION_LABELS: Record<ListingCondition, string> = {
-  'new': 'New',
+  new: 'New',
   'like-new': 'Like New',
-  'good': 'Good',
-  'fair': 'Fair',
+  good: 'Good',
+  fair: 'Fair',
 };
 
 export function ListingCard({
@@ -49,7 +49,7 @@ export function ListingCard({
           <span
             className={cn(
               'rounded-full border px-2.5 py-1 text-xs font-semibold',
-              CONDITION_STYLES[condition],
+              CONDITION_STYLES[condition]
             )}
           >
             {CONDITION_LABELS[condition]}
@@ -59,7 +59,9 @@ export function ListingCard({
 
       <div className="p-4">
         <h3 className="font-bold text-foreground">{title}</h3>
-        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{description}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+          {description}
+        </p>
         <div className="mt-1 flex items-center gap-1">
           <ShoppingBag className="h-3 w-3 text-muted-foreground" />
           <span className="text-xs text-muted-foreground">{seller}</span>
