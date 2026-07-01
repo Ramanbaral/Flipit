@@ -1,62 +1,114 @@
-from sqlalchemy import select, desc
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, UTC
+
 from fastapi import HTTPException, status
-from models import Listing, Bid, Order, OrderStatus, ListingType
+from sqlalchemy import desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import (
+    Bid,
+    Listing,
+    ListingType,
+    Order,
+    OrderStatus,
+)
 
 
-async def close_auction(db: AsyncSession, listing_id):
-    res = await db.execute(
+# ==========================================================
+# CLOSE AUCTION
+# ==========================================================
+
+async def close_auction(
+    db: AsyncSession,
+    listing_id,
+):
+    result = await db.execute(
         select(Listing).where(Listing.id == listing_id)
     )
-    listing = res.scalar_one_or_none()
+
+    listing = result.scalar_one_or_none()
 
     if not listing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Listing not found",
+            detail="Listing not found.",
         )
 
     if listing.type != ListingType.AUCTION:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Not auction",
+            detail="Listing is not an auction.",
         )
 
     if not listing.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Already closed",
+            detail="Auction has already been closed.",
         )
 
-    res = await db.execute(
+    # ------------------------------------------------------
+    # NEW: Prevent early closing
+    # ------------------------------------------------------
+    if (
+        listing.end_time
+        and datetime.now(UTC)
+        < listing.end_time.replace(tzinfo=UTC)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Auction has not ended yet.",
+        )
+
+    result = await db.execute(
         select(Bid)
         .where(Bid.listing_id == listing_id)
         .order_by(desc(Bid.amount))
     )
-    highest = res.scalars().first()
+
+    highest_bid = result.scalars().first()
 
     listing.is_active = False
 
-    if not highest:
-        await db.commit()
-        return {"message": "closed no bids"}
+    # ------------------------------------------------------
+    # No bids
+    # ------------------------------------------------------
+    if not highest_bid:
+
+        try:
+            await db.commit()
+
+        except Exception:
+            await db.rollback()
+            raise
+
+        return {
+            "message": "Auction closed successfully. No bids were placed."
+        }
 
     order = Order(
         listing_id=listing.id,
-        buyer_id=highest.user_id,
+        buyer_id=highest_bid.user_id,
         seller_id=listing.seller_id,
-        final_price=highest.amount,
+        final_price=highest_bid.amount,
         status=OrderStatus.COMPLETED,
     )
 
-    db.add(order)
-    listing.current_price = highest.amount
+    try:
 
-    await db.commit()
-    await db.refresh(order)
+        db.add(order)
+
+        listing.current_price = highest_bid.amount
+
+        await db.commit()
+        await db.refresh(order)
+
+    except Exception:
+        await db.rollback()
+        raise
 
     return {
-        "winner": str(highest.user_id),
-        "price": highest.amount,
-        "order_id": str(order.id),
-    }
+    "success": True,
+    "message": "Auction closed successfully.",
+    "winner": str(highest_bid.user_id),
+    "final_price": highest_bid.amount,
+    "order_id": str(order.id),
+}
