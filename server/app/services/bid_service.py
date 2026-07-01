@@ -1,5 +1,6 @@
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException, status
 
 from models import Listing, Bid
 
@@ -11,13 +12,22 @@ async def create_bid(db: AsyncSession, listing_id, user_id, amount):
     listing = res.scalar_one_or_none()
 
     if not listing:
-        raise ValueError("Listing not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Listing not found",
+        )
 
     if not listing.is_active:
-        raise ValueError("Inactive listing")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive listing",
+        )
 
     if str(listing.seller_id) == str(user_id):
-        raise ValueError("Seller cannot bid")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Seller cannot bid",
+        )
 
     res = await db.execute(
         select(Bid)

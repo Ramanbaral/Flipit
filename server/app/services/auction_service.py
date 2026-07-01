@@ -1,6 +1,6 @@
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from fastapi import HTTPException, status
 from models import Listing, Bid, Order, OrderStatus, ListingType
 
 
@@ -11,13 +11,22 @@ async def close_auction(db: AsyncSession, listing_id):
     listing = res.scalar_one_or_none()
 
     if not listing:
-        raise ValueError("Not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Listing not found",
+        )
 
     if listing.type != ListingType.AUCTION:
-        raise ValueError("Not auction")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Not auction",
+        )
 
     if not listing.is_active:
-        raise ValueError("Already closed")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Already closed",
+        )
 
     res = await db.execute(
         select(Bid)
