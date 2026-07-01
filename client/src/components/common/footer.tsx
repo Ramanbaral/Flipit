@@ -7,7 +7,7 @@ const FOOTER_LINKS: Record<string, { label: string; href: string }[]> = {
     { label: 'Categories', href: '#' },
   ],
   Company: [
-    { label: 'About', href: '#' },
+    { label: 'About', href: '/about' },
     { label: 'Trust & safety', href: '#' },
     { label: 'Careers', href: '#' },
   ],
@@ -27,14 +27,17 @@ export function Footer() {
           <div className="w-56 shrink-0">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <span className="text-sm font-extrabold text-primary-foreground">F</span>
+                <span className="text-sm font-extrabold text-primary-foreground">
+                  F
+                </span>
               </div>
               <span className="text-lg font-extrabold text-foreground">
                 Flip<span className="text-primary">It</span>
               </span>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              The trusted marketplace for premium secondhand goods — bid live or buy instantly.
+              The trusted marketplace for premium secondhand goods — bid live or
+              buy instantly.
             </p>
           </div>
 
@@ -48,7 +51,7 @@ export function Footer() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        className="text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
+                        className="text-sm text-muted-foreground no-underline transition-colors hover:text-primary/80"
                       >
                         {link.label}
                       </a>

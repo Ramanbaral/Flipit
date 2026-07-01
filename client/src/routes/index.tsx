@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { CategorySidebar } from '@/components/common/category-sidebar';
 import { HomeBanner } from '@/components/common/home-banner';
 import { TrendingAuctions } from '@/components/common/trending-auctions';
+import { TrendingListings } from '@/components/common/trending-listings';
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -20,9 +21,10 @@ function HomePage() {
         />
       </div>
       <main className="flex-1 p-6">
-        <div className="mx-auto max-w-2xl space-y-6">
+        <div className="space-y-6">
           <HomeBanner />
           <TrendingAuctions />
+          <TrendingListings />
         </div>
       </main>
     </div>
