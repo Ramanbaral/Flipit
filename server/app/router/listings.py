@@ -139,7 +139,22 @@ async def get_listing(
         listing_id,
     )
 
+# ==========================================================
+# GET SIMILAR LISTINGS (Content-Based Recommendation)
+# ==========================================================
 
+@router.get(
+    "/{listing_id}/recommendations",
+    response_model=list[schemas.ListingOut],
+)
+async def get_recommendations(
+    listing_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    return await service.get_similar_listings(
+        db,
+        listing_id,
+    )
 # ==========================================================
 # UPDATE LISTING
 # ==========================================================

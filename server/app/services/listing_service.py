@@ -1,10 +1,10 @@
 from typing import Optional
 from uuid import UUID
-
+from sqlalchemy import func
 from fastapi import HTTPException, status
 from sqlalchemy import select, or_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy import select, func
 from app import schemas
 from app.core.logger import logger
 from app.models import Listing, ListingType
@@ -285,3 +285,84 @@ async def delete_listing(
         "success": True,
         "message": "Listing deleted successfully.",
     }
+    
+
+
+
+async def get_similar_listings(
+    db: AsyncSession,
+    listing_id: UUID,
+    limit: int = 5,
+):
+    """
+    Content-Based Recommendation System
+
+    Recommendations are generated using:
+    1. Category
+    2. Listing Type
+    3. Item Condition
+    4. Similar Price
+    5. Title Keywords
+    """
+
+    result = await db.execute(
+        select(Listing).where(Listing.id == listing_id)
+    )
+
+    listing = result.scalar_one_or_none()
+
+    if not listing:
+        raise HTTPException(
+            status_code=404,
+            detail="Listing not found",
+        )
+
+    # Extract title keywords
+    keywords = [
+        word
+        for word in listing.title.split()
+        if len(word) > 2
+    ]
+
+    query = (
+        select(Listing)
+        .where(
+            Listing.id != listing.id,
+            Listing.is_active == True,
+            Listing.category_id == listing.category_id,
+            Listing.type == listing.type,
+        )
+    )
+
+    # Prefer same condition
+    if listing.condition:
+        query = query.where(
+            Listing.condition == listing.condition
+        )
+
+    # Keyword matching
+    if keywords:
+
+        keyword_filters = [
+            Listing.title.ilike(f"%{word}%")
+            for word in keywords
+        ]
+
+        query = query.where(
+            or_(*keyword_filters)
+        )
+
+    # Similar price
+    query = query.order_by(
+        func.abs(
+            Listing.current_price - listing.current_price
+        )
+    )
+
+    query = query.limit(limit)
+
+    result = await db.execute(query)
+
+    recommendations = result.scalars().all()
+
+    return recommendations
