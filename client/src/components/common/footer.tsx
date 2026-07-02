@@ -8,13 +8,13 @@ const FOOTER_LINKS: Record<string, { label: string; href: string }[]> = {
   ],
   Company: [
     { label: 'About', href: '/about' },
-    { label: 'Trust & safety', href: '#' },
-    { label: 'Careers', href: '#' },
+    { label: 'Trust & safety', href: '/trust-and-safety' },
+    { label: 'Careers', href: '/careers' },
   ],
   Support: [
-    { label: 'Help center', href: '#' },
-    { label: 'Contact', href: '#' },
-    { label: 'Buyer protection', href: '#' },
+    { label: 'Help center', href: '/help-center' },
+    { label: 'Contact', href: '/contact' },
+    { label: 'Buyer protection', href: '/buyer-protection' },
   ],
 };
 
@@ -47,16 +47,27 @@ export function Footer() {
               <div key={heading}>
                 <h3 className="text-sm font-bold text-foreground">{heading}</h3>
                 <ul className="mt-4 space-y-3">
-                  {links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        className="text-sm text-muted-foreground no-underline transition-colors hover:text-primary/80"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
+                  {links.map((link) =>
+                    link.href.startsWith('/') ? (
+                      <li key={link.label}>
+                        <Link
+                          to={link.href}
+                          className="text-sm text-muted-foreground no-underline transition-colors hover:text-primary/80"
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ) : (
+                      <li key={link.label}>
+                        <a
+                          href={link.href}
+                          className="text-sm text-muted-foreground no-underline transition-colors hover:text-primary/80"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
             ))}

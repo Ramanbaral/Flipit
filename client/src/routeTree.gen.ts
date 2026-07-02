@@ -9,9 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrustAndSafetyRouteImport } from './routes/trust-and-safety'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as HelpCenterRouteImport } from './routes/help-center'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateListingRouteImport } from './routes/create-listing'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as BuyerProtectionRouteImport } from './routes/buyer-protection'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UserProfileUserIdRouteImport } from './routes/user-profile.$userId'
@@ -19,9 +24,19 @@ import { Route as ListingDetailIdRouteImport } from './routes/listing-detail.$id
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 
+const TrustAndSafetyRoute = TrustAndSafetyRouteImport.update({
+  id: '/trust-and-safety',
+  path: '/trust-and-safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpCenterRoute = HelpCenterRouteImport.update({
+  id: '/help-center',
+  path: '/help-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -32,6 +47,21 @@ const DashboardRoute = DashboardRouteImport.update({
 const CreateListingRoute = CreateListingRouteImport.update({
   id: '/create-listing',
   path: '/create-listing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuyerProtectionRoute = BuyerProtectionRouteImport.update({
+  id: '/buyer-protection',
+  path: '/buyer-protection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -68,9 +98,14 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/buyer-protection': typeof BuyerProtectionRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
   '/create-listing': typeof CreateListingRoute
   '/dashboard': typeof DashboardRoute
+  '/help-center': typeof HelpCenterRoute
   '/search': typeof SearchRoute
+  '/trust-and-safety': typeof TrustAndSafetyRoute
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
   '/listing-detail/$id': typeof ListingDetailIdRoute
@@ -79,9 +114,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/buyer-protection': typeof BuyerProtectionRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
   '/create-listing': typeof CreateListingRoute
   '/dashboard': typeof DashboardRoute
+  '/help-center': typeof HelpCenterRoute
   '/search': typeof SearchRoute
+  '/trust-and-safety': typeof TrustAndSafetyRoute
   '/login': typeof AuthLoginRoute
   '/signup': typeof AuthSignupRoute
   '/listing-detail/$id': typeof ListingDetailIdRoute
@@ -91,9 +131,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/buyer-protection': typeof BuyerProtectionRoute
+  '/careers': typeof CareersRoute
+  '/contact': typeof ContactRoute
   '/create-listing': typeof CreateListingRoute
   '/dashboard': typeof DashboardRoute
+  '/help-center': typeof HelpCenterRoute
   '/search': typeof SearchRoute
+  '/trust-and-safety': typeof TrustAndSafetyRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/signup': typeof AuthSignupRoute
   '/listing-detail/$id': typeof ListingDetailIdRoute
@@ -104,9 +149,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/buyer-protection'
+    | '/careers'
+    | '/contact'
     | '/create-listing'
     | '/dashboard'
+    | '/help-center'
     | '/search'
+    | '/trust-and-safety'
     | '/login'
     | '/signup'
     | '/listing-detail/$id'
@@ -115,9 +165,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/buyer-protection'
+    | '/careers'
+    | '/contact'
     | '/create-listing'
     | '/dashboard'
+    | '/help-center'
     | '/search'
+    | '/trust-and-safety'
     | '/login'
     | '/signup'
     | '/listing-detail/$id'
@@ -126,9 +181,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/buyer-protection'
+    | '/careers'
+    | '/contact'
     | '/create-listing'
     | '/dashboard'
+    | '/help-center'
     | '/search'
+    | '/trust-and-safety'
     | '/_auth/login'
     | '/_auth/signup'
     | '/listing-detail/$id'
@@ -138,9 +198,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BuyerProtectionRoute: typeof BuyerProtectionRoute
+  CareersRoute: typeof CareersRoute
+  ContactRoute: typeof ContactRoute
   CreateListingRoute: typeof CreateListingRoute
   DashboardRoute: typeof DashboardRoute
+  HelpCenterRoute: typeof HelpCenterRoute
   SearchRoute: typeof SearchRoute
+  TrustAndSafetyRoute: typeof TrustAndSafetyRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
   ListingDetailIdRoute: typeof ListingDetailIdRoute
@@ -149,11 +214,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trust-and-safety': {
+      id: '/trust-and-safety'
+      path: '/trust-and-safety'
+      fullPath: '/trust-and-safety'
+      preLoaderRoute: typeof TrustAndSafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help-center': {
+      id: '/help-center'
+      path: '/help-center'
+      fullPath: '/help-center'
+      preLoaderRoute: typeof HelpCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -168,6 +247,27 @@ declare module '@tanstack/react-router' {
       path: '/create-listing'
       fullPath: '/create-listing'
       preLoaderRoute: typeof CreateListingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/buyer-protection': {
+      id: '/buyer-protection'
+      path: '/buyer-protection'
+      fullPath: '/buyer-protection'
+      preLoaderRoute: typeof BuyerProtectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -218,9 +318,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BuyerProtectionRoute: BuyerProtectionRoute,
+  CareersRoute: CareersRoute,
+  ContactRoute: ContactRoute,
   CreateListingRoute: CreateListingRoute,
   DashboardRoute: DashboardRoute,
+  HelpCenterRoute: HelpCenterRoute,
   SearchRoute: SearchRoute,
+  TrustAndSafetyRoute: TrustAndSafetyRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
   ListingDetailIdRoute: ListingDetailIdRoute,
