@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.services import listing_service as service
+from app.services import recommendation_service as rec_service
 from app import schemas
 from app.models import ListingType
 
@@ -23,21 +24,6 @@ router = APIRouter(
     response_model=schemas.ListingOut,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new listing",
-    description="""
-Create a marketplace listing.
-
-Supports two listing types:
-
-- **FIXED** → Requires a fixed `price`
-- **AUCTION** → Requires `start_price` and `end_time`
-
-Validation is automatically performed based on the listing type.
-""",
-    responses={
-        201: {"description": "Listing created successfully"},
-        400: {"description": "Invalid listing data"},
-        422: {"description": "Validation error"},
-    },
 )
 async def create_listing(
     data: schemas.ListingCreate,
@@ -47,60 +33,23 @@ async def create_listing(
 
 
 # ==========================================================
-# GET ALL LISTINGS
+# GET ALL LISTINGS (SEARCH + FILTER + SORT)
 # ==========================================================
 
 @router.get(
     "",
     response_model=schemas.ListingListResponse,
     summary="Get all listings",
-    description="""
-Retrieve marketplace listings.
-
-Supports searching, filtering, sorting and pagination.
-""",
-    responses={
-        200: {"description": "Listings retrieved successfully"},
-    },
 )
 async def get_listings(
-    search: Optional[str] = Query(
-        None,
-        description="Search listings by title or description.",
-    ),
-    category_id: Optional[int] = Query(
-        None,
-        description="Filter by category ID.",
-    ),
-    listing_type: Optional[ListingType] = Query(
-        None,
-        description="Listing type (FIXED or AUCTION).",
-    ),
-    min_price: Optional[float] = Query(
-        None,
-        ge=0,
-        description="Minimum current price.",
-    ),
-    max_price: Optional[float] = Query(
-        None,
-        ge=0,
-        description="Maximum current price.",
-    ),
-    sort: str = Query(
-        "newest",
-        description="Sort results: newest, oldest, price_low, price_high.",
-    ),
-    limit: int = Query(
-        10,
-        ge=1,
-        le=100,
-        description="Maximum number of listings returned.",
-    ),
-    offset: int = Query(
-        0,
-        ge=0,
-        description="Pagination offset.",
-    ),
+    search: Optional[str] = Query(None),
+    category_id: Optional[int] = Query(None),
+    listing_type: Optional[ListingType] = Query(None),
+    min_price: Optional[float] = Query(None, ge=0),
+    max_price: Optional[float] = Query(None, ge=0),
+    sort: str = Query("newest"),
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):
     return await service.get_listings(
@@ -124,37 +73,33 @@ async def get_listings(
     "/{listing_id}",
     response_model=schemas.ListingOut,
     summary="Get listing by ID",
-    description="Retrieve a single listing using its UUID.",
-    responses={
-        200: {"description": "Listing retrieved successfully"},
-        404: {"description": "Listing not found"},
-    },
 )
 async def get_listing(
     listing_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.get_listing(
-        db,
-        listing_id,
-    )
+    return await service.get_listing(db, listing_id)
+
 
 # ==========================================================
-# GET SIMILAR LISTINGS (Content-Based Recommendation)
+# GET SIMILAR LISTINGS (RECOMMENDATIONS)
 # ==========================================================
 
 @router.get(
     "/{listing_id}/recommendations",
-    response_model=list[schemas.ListingOut],
+    summary="Get similar listings",
 )
 async def get_recommendations(
     listing_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.get_similar_listings(
+    return await rec_service.get_similar_listings(
         db,
         listing_id,
+        limit=5
     )
+
+
 # ==========================================================
 # UPDATE LISTING
 # ==========================================================
@@ -162,27 +107,14 @@ async def get_recommendations(
 @router.patch(
     "/{listing_id}",
     response_model=schemas.ListingOut,
-    summary="Update a listing",
-    description="""
-Update one or more fields of an existing listing.
-
-Only supplied fields are modified.
-""",
-    responses={
-        200: {"description": "Listing updated successfully"},
-        404: {"description": "Listing not found"},
-    },
+    summary="Update listing",
 )
 async def update_listing(
     listing_id: UUID,
     data: schemas.ListingUpdate,
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.update_listing(
-        db,
-        listing_id,
-        data,
-    )
+    return await service.update_listing(db, listing_id, data)
 
 
 # ==========================================================
@@ -192,18 +124,10 @@ async def update_listing(
 @router.delete(
     "/{listing_id}",
     response_model=schemas.MessageResponse,
-    summary="Delete a listing",
-    description="Delete a listing permanently.",
-    responses={
-        200: {"description": "Listing deleted successfully"},
-        404: {"description": "Listing not found"},
-    },
+    summary="Delete listing",
 )
 async def delete_listing(
     listing_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.delete_listing(
-        db,
-        listing_id,
-    )
+    return await service.delete_listing(db, listing_id)
